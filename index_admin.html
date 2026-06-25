@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم إدارة بلاد الشام - الفخامة الشامية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #122b22;        
+            --bg-card: #18372c;        
+            --logo-red: #bd2333;       
+            --gold-premium: #dfb253;   
+            --text-white: #f8fafc;
+            --text-muted: #a3b8b0;     
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --bg-input: rgba(7, 18, 14, 0.4);
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            scroll-behavior: smooth; 
+        }
+
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-white); 
+            font-family: 'Alexandria', sans-serif; 
+            overflow-x: hidden; 
+            padding-bottom: 60px;
+            background-image: 
+                radial-gradient(circle at 80% 20%, rgba(223, 178, 83, 0.05) 0%, transparent 55%),
+                radial-gradient(circle at 20% 80%, rgba(189, 35, 51, 0.05) 0%, transparent 55%),
+                url('logo.jpg');
+            background-size: auto, auto, 120px;
+            background-repeat: no-repeat, no-repeat, repeat;
+            background-blend-mode: normal, normal, overlay;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(18, 43, 34, 0.94);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 180px;
+            background: radial-gradient(ellipse at top, rgba(223, 178, 83, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 1001;
+        }
+
+        /* --- واجهة حماية كلمة المرور (Login) --- */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 15%, rgba(223, 178, 83, 0.12) 0%, transparent 55%),
+                url('logo.jpg');
+            background-size: auto, 120px;
+            background-repeat: no-repeat, repeat;
+            background-blend-mode: normal, overlay;
+            z-index: 9999;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .login-overlay::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 43, 34, 0.94); z-index: -1;
+        }
+
+        .login-card {
+            background: linear-gradient(145deg, var(--bg-card) 0%, #0e221b 100%);
+            border: 1px solid rgba(223, 178, 83, 0.2);
+            padding: 40px 30px; border-radius: 28px; width: 100%; max-width: 420px;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden; z-index: 1;
+        }
+
+        .login-card::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold-premium), transparent);
+        }
+
+        .login-card .lock-icon {
+            width: 70px; height: 70px; background: rgba(223, 178, 83, 0.1); color: var(--gold-premium);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; margin: 0 auto 20px; border: 1px solid rgba(223, 178, 83, 0.2);
+            box-shadow: 0 0 15px rgba(223, 178, 83, 0.2);
+        }
+
+        .login-card h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+        .login-card p { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px; }
+        .error-msg { color: #ff5252; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px; display: none; font-weight: 600; }
+
+        .admin-wrapper { display: none; }
+
+        /* --- الهيدر الفاخر بتأثير الحركة السينمائية الذكية --- */
+        header {
+            background-color: rgba(18, 43, 34, 0.85); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(223, 178, 83, 0.15); padding: 25px 8% 15px 8%;
+            display: flex; justify-content: space-between; align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; 
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            transition: top 0.4s cubic-bezier(0.3, 0, 0.2, 1);
+        }
+
+        header.hide-header {
+            top: -115px;
+        }
+
+        /* نقل الزخرفة لهنا باش تختفي مع الهيدر فالسكرول وما تضربش فالكتابة */
+        .top-luxury-ornament {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 100%; max-width: 600px; height: 25px;
+            background: linear-gradient(to bottom, var(--gold-premium) 1px, transparent 1px);
+            opacity: 0.4; pointer-events: none; z-index: 1002;
+        }
+        .top-luxury-ornament::after {
+            content: "❖ ❖ ❖ ⚜ ❖ ❖ ❖";
+            position: absolute;
+            top: 2px; left: 50%; transform: translateX(-50%);
+            color: var(--gold-premium); font-size: 10px; letter-spacing: 6px;
+            opacity: 0.7; text-shadow: 0 0 8px rgba(223, 178, 83, 0.6);
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-area img { height: 55px; width: auto; border-radius: 50%; border: 2px solid rgba(223, 178, 83, 0.3); }
+        .logo-area h1 { font-size: 1.3rem; font-weight: 800; color: var(--text-white); }
+        .logo-area h1 span { color: var(--gold-premium); font-size: 0.85rem; display: block; font-weight: 400; margin-top: 2px; }
+
+        .view-site-btn {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border);
+            color: var(--gold-premium); padding: 10px 20px; border-radius: 30px;
+            font-weight: 600; font-size: 0.85rem; text-decoration: none;
+            display: flex; align-items: center; gap: 8px; transition: 0.3s ease;
+            box-shadow: 0 0 10px rgba(223, 178, 83, 0.05);
+        }
+        .view-site-btn:hover { background: rgba(223, 178, 83, 0.1); border-color: var(--gold-premium); transform: translateY(-2px); box-shadow: 0 0 15px rgba(223, 178, 83, 0.2); }
+
+        /* --- حاوية المحتوى الرئيسي --- */
+        .admin-container { max-width: 1200px; margin: 130px auto 50px auto; padding: 0 20px; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 40px; align-items: start; }
+
+        @media (max-width: 992px) { 
+            .admin-grid { grid-template-columns: 1fr; } 
+            .form-card { position: relative !important; top: 0 !important; max-height: none !important; }
+        }
+
+        /* --- كارت الفورم الفخم --- */
+        .form-card {
+            background: linear-gradient(145deg, var(--bg-card) 0%, #0e221b 100%);
+            border: 1px solid rgba(223, 178, 83, 0.15); padding: 35px; border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            position: sticky; top: 120px; max-height: calc(100vh - 150px); overflow-y: auto;
+        }
+
+        .form-card::-webkit-scrollbar { width: 6px; }
+        .form-card::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        .form-card::-webkit-scrollbar-thumb { background: rgba(223, 178, 83, 0.2); border-radius: 10px; }
+
+        .form-card h2 {
+            font-size: 1.4rem; font-weight: 800; color: var(--gold-premium); margin-bottom: 25px;
+            display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 15px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 7px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
+        
+        .form-group label span.lang-badge {
+            background: rgba(223, 178, 83, 0.1); color: var(--gold-premium);
+            padding: 2px 6px; border-radius: 6px; font-size: 0.75rem; margin-right: 6px; font-weight: 700;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; background-color: var(--bg-input); border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 16px; border-radius: 12px; color: white; font-family: inherit; font-size: 0.9rem; transition: all 0.3s ease;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--gold-premium); background-color: rgba(7, 18, 14, 0.7); box-shadow: 0 0 15px rgba(223, 178, 83, 0.05); }
+        .form-group select option { background-color: var(--bg-dark); color: white; }
+
+        .form-group.ltr-input input, .form-group.ltr-input textarea { direction: ltr; text-align: left; }
+
+        .upload-box {
+            border: 2px dashed rgba(223, 178, 83, 0.25); background: rgba(0, 0, 0, 0.15);
+            border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; position: relative;
+        }
+        .upload-box:hover { border-color: var(--gold-premium); background: rgba(223, 178, 83, 0.03); }
+        .upload-box i { font-size: 1.8rem; color: var(--gold-premium); margin-bottom: 8px; display: block; }
+        .upload-box span { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+
+        .preview-wrapper { margin-top: 15px; border-radius: 12px; overflow: hidden; height: 140px; display: none; border: 1px solid rgba(255,255,255,0.1); }
+        .preview-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+        .btn-submit {
+            width: 100%; background: linear-gradient(135deg, var(--logo-red) 0%, #901420 100%); color: white;
+            border: none; padding: 14px; border-radius: 30px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 4px 20px rgba(189, 35, 51, 0.3); margin-top: 10px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(189, 35, 51, 0.5); filter: brightness(1.1); }
+
+        .btn-cancel {
+            width: 100%; background: rgba(255, 255, 255, 0.05); color: var(--text-muted);
+            border: 1px solid var(--glass-border); padding: 12px; border-radius: 30px; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+            transition: 0.3s; display: none; align-items: center; justify-content: center; gap: 10px; margin-top: 10px;
+        }
+        .btn-cancel:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        /* --- كارت الفلترة والبحث --- */
+        .filter-container {
+            display: flex; gap: 12px; margin-bottom: 20px; background: rgba(0, 0, 0, 0.2);
+            padding: 12px; border-radius: 16px; border: 1px solid var(--glass-border);
+        }
+        .filter-container .search-input-wrapper { flex-grow: 1; position: relative; }
+        .filter-container .search-input-wrapper i { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .filter-container input {
+            width: 100%; background-color: var(--bg-input); border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 40px 12px 15px; border-radius: 12px; color: white; font-family: inherit; font-size: 0.85rem; outline: none; transition: 0.3s;
+        }
+        .filter-container select {
+            background-color: var(--bg-input); border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 15px; border-radius: 12px; color: white; font-family: inherit; font-size: 0.85rem; outline: none; transition: 0.3s; min-width: 140px;
+        }
+        .filter-container input:focus, .filter-container select:focus { border-color: var(--gold-premium); }
+
+        /* --- كارت المنيو الحالي وريد الوجبات --- */
+        .menu-list-section h2 { 
+            font-size: 1.6rem; 
+            font-weight: 800; 
+            margin-bottom: 25px; 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            line-height: 1.4;
+        }
+        /* فيكس الفونت وتوسيط العداد بشكل ممتاز على الـ PC */
+        .menu-list-section h2 span { 
+            background: rgba(223, 178, 83, 0.12); 
+            color: var(--gold-premium); 
+            padding: 2px 12px; 
+            border-radius: 20px; 
+            font-size: 0.95rem; 
+            font-weight: 700; 
+            box-shadow: 0 0 10px rgba(223, 178, 83, 0.15); 
+            border: 1px solid rgba(223, 178, 83, 0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 28px;
+        }
+
+        .admin-grid-view { display: flex; flex-direction: column; gap: 20px; }
+
+        .admin-prod-card { background-color: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 18px; display: flex; align-items: center; gap: 20px; transition: 0.3s ease; }
+        .admin-prod-card:hover { border-color: rgba(223, 178, 83, 0.25); transform: scale(1.01); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+
+        .admin-prod-img { width: 90px; height: 90px; border-radius: 14px; object-fit: cover; border: 1px solid rgba(255,255,255,0.05); background: #07120e; }
+        .admin-prod-details { flex-grow: 1; }
+        .admin-prod-details h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-white); margin-bottom: 4px; }
+        
+        .admin-prod-details .lang-preview { font-size: 0.75rem; color: var(--gold-premium); margin-bottom: 4px; font-weight: 600; display: inline-block; margin-left: 10px; }
+        .admin-prod-details p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; max-width: 400px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 5px; }
+
+        .admin-prod-right { text-align: left; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+        .admin-prod-price { font-size: 1.15rem; font-weight: 700; color: var(--gold-premium); white-space: nowrap; }
+
+        .action-buttons { display: flex; gap: 8px; }
+
+        .btn-edit {
+            background: rgba(223, 178, 83, 0.1); border: 1px solid rgba(223, 178, 83, 0.2); color: var(--gold-premium);
+            padding: 8px 14px; border-radius: 30px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; gap: 6px; transition: 0.2s;
+        }
+        .btn-edit:hover { background: var(--gold-premium); color: var(--bg-dark); border-color: var(--gold-premium); box-shadow: 0 4px 15px rgba(223,178,83,0.3); }
+
+        .btn-delete {
+            background: rgba(189, 35, 51, 0.1); border: 1px solid rgba(189, 35, 51, 0.2); color: #ff5252;
+            padding: 8px 14px; border-radius: 30px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; gap: 6px; transition: 0.2s;
+        }
+        .btn-delete:hover { background: var(--logo-red); color: white; border-color: var(--logo-red); box-shadow: 0 4px 15px rgba(189,35,51,0.3); }
+
+        .no-data { text-align: center; padding: 50px 20px; color: var(--text-muted); background: rgba(0,0,0,0.1); border-radius: 20px; border: 1px dashed var(--glass-border); font-size: 0.95rem; }
+        footer { padding: 30px; text-align: center; color: #557569; font-size: 0.85rem; border-top: 1px solid var(--glass-border); margin-top: 80px; }
+    </style>
+</head>
+<body>
+
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card">
+            <div class="lock-icon"><i class="fas fa-lock"></i></div>
+            <h2>سجل دخولك للإدارة</h2>
+            <p>المرجو إدخال كلمة المرور السرية لفتح لوحة التحكم الملكية</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="password" id="passwordInput" placeholder="كلمة المرور الإدارية" required style="text-align: center;">
+                </div>
+                <div class="error-msg" id="loginError">❌ كلمة المرور غير صحيحة، حاول مجدداً!</div>
+                <button type="submit" class="btn-submit" style="background: var(--gold-premium); color: #122b22;">
+                    <i class="fas fa-key"></i> دخول آمن
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-wrapper" id="adminWrapper">
+        
+        <header>
+            <div class="top-luxury-ornament"></div>
+            <div class="logo-area">
+                <img src="logo.jpg" alt="بلاد الشام" onerror="this.src='https://via.placeholder.com/55'">
+                <h1>لوحة التحكم <span>مطعم بلاد الشام الملكي</span></h1>
+            </div>
+            <a href="index.html" class="view-site-btn" target="_blank">
+                <i class="fas fa-external-link-alt"></i> عرض موقع الزبائن
+            </a>
+        </header>
+
+        <div class="admin-container">
+            <div class="admin-grid">
+                
+                <div class="form-card">
+                    <h2 id="formTitle"><i class="fas fa-plus-circle"></i> إضافة وجبة ملكية جديدة</h2>
+                    <form id="addCardForm">
+                        <div class="form-group">
+                            <label>إدخل صورة الوجبة:</label>
+                            <div class="upload-box" onclick="document.getElementById('imageFile').click()" id="uploadBtnText">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>اضغط هنا واختار تصويرة الفوطو للوجبة</span>
+                            </div>
+                            <input type="file" id="imageFile" accept="image/*" style="display: none;">
+                            <div class="preview-wrapper" id="previewContainer">
+                                <img id="imagePreview" src="" alt="المعاينة">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>صنف الوجبة (Category):</label>
+                            <select id="categoryType" required>
+                                <option value="royal">منيو رويال (Menu Royal)</option>
+                                <option value="drinks">مشروبات (Machrobat)</option>
+                                <option value="sweets">حلويات (7alawyat)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>إسم الوجبة <span class="lang-badge">العربية</span>:</label>
+                            <input type="text" id="nameAr" placeholder="مثال: شاورما عربي دبل" required>
+                        </div>
+                        <div class="form-group">
+                            <label>وصف ومكونات الوجبة <span class="lang-badge">العربية</span>:</label>
+                            <textarea id="descAr" rows="2" placeholder="مثال: قطع الشاورما الفاخرة مع بطاطس..." required></textarea>
+                        </div>
+
+                        <div class="form-group ltr-input">
+                            <label style="direction: rtl; text-align: right;">Nom du plat <span class="lang-badge">Français</span>:</label>
+                            <input type="text" id="nameFr" placeholder="Ex: Shawarma Arabe Double" required>
+                        </div>
+                        <div class="form-group ltr-input">
+                            <label style="direction: rtl; text-align: right;">Description <span class="lang-badge">Français</span>:</label>
+                            <textarea id="descFr" rows="2" placeholder="Ex: Morceaux de shawarma premium avec frites..." required></textarea>
+                        </div>
+
+                        <div class="form-group ltr-input">
+                            <label style="direction: rtl; text-align: right;">Meal Name <span class="lang-badge">English</span>:</label>
+                            <input type="text" id="nameEn" placeholder="Ex: Double Arabic Shawarma" required>
+                        </div>
+                        <div class="form-group ltr-input">
+                            <label style="direction: rtl; text-align: right;">Description <span class="lang-badge">English</span>:</label>
+                            <textarea id="descEn" rows="2" placeholder="Ex: Premium shawarma slices with crispy fries..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>ثمن الوجبة (درهم مغربي):</label>
+                            <input type="number" id="price" placeholder="مثال: 45" required>
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <i class="fas fa-save"></i> حفظ ونشر الوجبة بثلاث لغات
+                        </button>
+                        <button type="button" class="btn-cancel" id="cancelEditBtn" onclick="cancelEditMode()">
+                            <i class="fas fa-times"></i> إلغاء التعديل
+                        </button>
+                    </form>
+                </div>
+
+                <div class="menu-list-section">
+                    <h2>الوجبات المعروضة حالياً <span id="totalItemsCounter">0</span></h2>
+                    
+                    <div class="filter-container">
+                        <div class="search-input-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="بحث باسم الوجبة باللغات الـ3..." oninput="renderAdminMenu()">
+                        </div>
+                        <select id="filterCategory" onchange="renderAdminMenu()">
+                            <option value="all">كل الأصناف</option>
+                            <option value="royal">منيو رويال (Menu Royal)</option>
+                            <option value="drinks">مشروبات (Machrobat)</option>
+                            <option value="sweets">حلويات (7alawyat)</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-grid-view" id="adminMenuGrid"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 لوحة إدارة مطعم بلاد الشام الفاخر. جميع الحقوق محفوظة.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- حماية كلمة المرور ---
+        const CORRECT_PASSWORD = "1234"; 
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const inputPass = document.getElementById('passwordInput').value;
+            const errorMsg = document.getElementById('loginError');
+
+            if (inputPass === CORRECT_PASSWORD) {
+                document.getElementById('loginOverlay').style.display = "none";
+                document.getElementById('adminWrapper').style.display = "block";
+                renderAdminMenu();
+            } else {
+                errorMsg.style.display = "block";
+                document.getElementById('passwordInput').value = "";
+            }
+        });
+
+        // مصفوفة الوجبات الافتراضية
+        const defaultProducts = [
+            {
+                id: 1,
+                type: "royal",
+                price: 45,
+                img: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?q=80&w=600",
+                nameAr: "شاورما ملكية بالخلطة السرية",
+                descAr: "شرائح الدجاج الفاخرة منقوعة 24 ساعة، تُقدم مع الثومية الغنية، البطاطس المق المقرمشة والمخلل الشامي الأصيل.",
+                nameFr: "Shawarma Royal", descFr: "Poulet mariné 24h avec sauce à l'ail et frites.",
+                nameEn: "Royal Shawarma", descEn: "Chicken marinated 24h avec garlic sauce and fries."
+            },
+            {
+                id: 2,
+                type: "royal",
+                price: 85,
+                img: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?q=80&w=600",
+                nameAr: "مشاوي مشكلة فاخرة (توشكا و كباب)",
+                descAr: "تشكيلة راقية من الكباب الحلبي، الشيش طاووق، والأوصال المشوية على الفحم، تُقدم مع الخبز البيواظ المحمر.",
+                nameFr: "Grillades Mixtes", descFr: "Mélange de brochettes de kebab, tawouk et grillades de luxe.",
+                nameEn: "Premium Mixed Grills", descEn: "Elite selection of kebab, tawouk and charcoal grills."
+            }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('restaurant_menu')) || defaultProducts;
+        let base64ImageString = "";
+        let editingProductId = null; 
+
+        document.getElementById('imageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    base64ImageString = event.target.result;
+                    document.getElementById('imagePreview').src = base64ImageString;
+                    document.getElementById('previewContainer').style.display = "block";
+                    document.getElementById('uploadBtnText').querySelector('span').innerText = "تغيير الصورة المحددة";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // رندر وعرض الوجبات
+        function renderAdminMenu() {
+            const container = document.getElementById('adminMenuGrid');
+            if(!container) return; 
+            
+            const searchTerm = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : "";
+            const filterCat = document.getElementById('filterCategory') ? document.getElementById('filterCategory').value : "all";
+
+            const filteredProducts = products.filter(p => {
+                const matchName = (p.nameAr && p.nameAr.toLowerCase().includes(searchTerm)) || 
+                                  (p.nameFr && p.nameFr.toLowerCase().includes(searchTerm)) || 
+                                  (p.nameEn && p.nameEn.toLowerCase().includes(searchTerm));
+                
+                const itemType = p.type || p.category;
+                const matchCategory = (filterCat === "all") || (itemType === filterCat);
+                
+                return matchName && matchCategory;
+            });
+
+            document.getElementById('totalItemsCounter').innerText = filteredProducts.length;
+
+            if (filteredProducts.length === 0) {
+                container.innerHTML = `<div class="no-data"><i class="fas fa-search" style="font-size: 2rem; display:block; margin-bottom:10px; color:var(--gold-premium);"></i> لا توجد أي وجبة تطابق بحثك الحالي.</div>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            filteredProducts.forEach(p => {
+                let categoryName = "";
+                const itemType = p.type || p.category;
+                
+                switch(itemType) {
+                    case 'royal': 
+                    case 'menu-royal': 
+                        categoryName = 'منيو رويال'; break;
+                    case 'drinks': categoryName = 'مشروبات'; break;
+                    case 'sweets': categoryName = 'حلويات'; break;
+                    default: categoryName = itemType || 'غير محدد';
+                }
+
+                container.innerHTML += `
+                    <div class="admin-prod-card">
+                        <img src="${p.img}" class="admin-prod-img" alt="${p.nameAr}">
+                        <div class="admin-prod-details">
+                            <h3>${p.nameAr}</h3>
+                            <div class="lang-preview">🏷️ الصنف: ${categoryName}</div>
+                            <div class="lang-preview">🇫🇷 ${p.nameFr || p.nameAr}</div>
+                            <div class="lang-preview">🇬🇧 ${p.nameEn || p.nameAr}</div>
+                            <p>${p.descAr}</p>
+                        </div>
+                        <div class="admin-prod-right">
+                            <span class="admin-prod-price">${p.price} د.م.</span>
+                            <div class="action-buttons">
+                                <button class="btn-edit" onclick="editProduct(${p.id})">
+                                    <i class="fas fa-edit"></i> تعديل
+                                </button>
+                                <button class="btn-delete" onclick="deleteProduct(${p.id})">
+                                    <i class="fas fa-trash-alt"></i> حذف
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // جلب البيانات للفورم وبدء التعديل
+        function editProduct(id) {
+            const prod = products.find(p => p.id === id);
+            if(!prod) return;
+            
+            editingProductId = id; 
+            
+            document.getElementById('categoryType').value = prod.type || 'royal';
+            document.getElementById('nameAr').value = prod.nameAr;
+            document.getElementById('descAr').value = prod.descAr;
+            document.getElementById('nameFr').value = prod.nameFr || '';
+            document.getElementById('descFr').value = prod.descFr || '';
+            document.getElementById('nameEn').value = prod.nameEn || '';
+            document.getElementById('descEn').value = prod.descEn || '';
+            document.getElementById('price').value = prod.price;
+            
+            base64ImageString = prod.img;
+            document.getElementById('imagePreview').src = base64ImageString;
+            document.getElementById('previewContainer').style.display = "block";
+            document.getElementById('uploadBtnText').querySelector('span').innerText = "تغيير الصورة (اختياري)";
+            
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> تعديل الوجبة المحددة';
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ التعديلات';
+            submitBtn.style.background = 'linear-gradient(135deg, var(--gold-premium) 0%, #b8860b 100%)';
+            submitBtn.style.color = '#122b22';
+            
+            document.getElementById('cancelEditBtn').style.display = 'flex';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // إلغاء التعديل والرجوع للإضافة
+        function cancelEditMode() {
+            editingProductId = null;
+            document.getElementById('addCardForm').reset();
+            
+            base64ImageString = "";
+            document.getElementById('previewContainer').style.display = "none";
+            document.getElementById('uploadBtnText').querySelector('span').innerText = "اضغط هنا واختار تصويرة الفوطو للوجبة";
+            
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> إضافة وجبة ملكية جديدة';
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ ونشر الوجبة بثلاث لغات';
+            submitBtn.style.background = '';
+            submitBtn.style.color = '';
+            
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+
+        // حفظ الوجبة (إضافة أو تعديل)
+        document.getElementById('addCardForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const categoryType = document.getElementById('categoryType').value;
+            const nameAr = document.getElementById('nameAr').value;
+            const descAr = document.getElementById('descAr').value;
+            const nameFr = document.getElementById('nameFr').value;
+            const descFr = document.getElementById('descFr').value;
+            const nameEn = document.getElementById('nameEn').value;
+            const descEn = document.getElementById('descEn').value;
+            const price = document.getElementById('price').value;
+
+            if (!base64ImageString && !editingProductId) {
+                alert("المرجو اختيار صورة أولاً للوجبة!");
+                return;
+            }
+
+            if (editingProductId) {
+                const index = products.findIndex(p => p.id === editingProductId);
+                if(index !== -1) {
+                    products[index].type = categoryType;
+                    products[index].price = parseInt(price);
+                    if(base64ImageString) products[index].img = base64ImageString; 
+                    products[index].nameAr = nameAr;
+                    products[index].descAr = descAr;
+                    products[index].nameFr = nameFr;
+                    products[index].descFr = descFr;
+                    products[index].nameEn = nameEn;
+                    products[index].descEn = descEn;
+                    
+                    localStorage.setItem('restaurant_menu', JSON.stringify(products));
+                    alert("تم تعديل الوجبة بنجاح!");
+                    cancelEditMode(); 
+                    renderAdminMenu();
+                }
+            } else {
+                const newProduct = {
+                    id: Date.now(),
+                    type: categoryType, 
+                    price: parseInt(price),
+                    img: base64ImageString, 
+                    nameAr: nameAr,
+                    descAr: descAr,
+                    nameFr: nameFr,
+                    descFr: descFr, 
+                    nameEn: nameEn,
+                    descEn: descEn
+                };
+
+                products.unshift(newProduct); 
+                localStorage.setItem('restaurant_menu', JSON.stringify(products));
+                alert("تمت إضافة الوجبة بنجاح!");
+                cancelEditMode(); 
+                renderAdminMenu();
+            }
+        });
+
+        function deleteProduct(id) {
+            if(confirm("واش متأكد بغيتي تمسح هاد الوجبة بصفة نهائية من المنيو؟")) {
+                if (editingProductId === id) {
+                    cancelEditMode();
+                }
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('restaurant_menu', JSON.stringify(products));
+                renderAdminMenu();
+            }
+        }
+
+        // --- مراقبة الحركة لإخفاء وإظهار الهيدر بسلاسة ---
+        let lastScrollTop = 0;
+        const headerElement = document.querySelector('header');
+
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 80) {
+                headerElement.classList.add('hide-header');
+            } else {
+                headerElement.classList.remove('hide-header');
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+        });
+    </script>
+</body>
+</html>
